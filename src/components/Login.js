@@ -2,12 +2,18 @@ import React, { useRef, useState } from "react";
 import Header from "./Header";
 import { checkValidate } from "../utils/validate";
 import { CrossIcon } from "../utils/svgConstants";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { auth } from "../utils/firebase";
 
 const Login = () => {
-  const [isSignedIn, setIsSignedIn] = useState(false);
+  const [isSignedInForm, setIsSignedInForm] = useState(true);
   const [errMessage, setErrMessage] = useState(null);
   function toggleSignIn() {
-    setIsSignedIn(!isSignedIn);
+    setIsSignedInForm(!isSignedInForm);
+    setErrMessage(null);
   }
   //Create a reference for email,password and full name input and give back a current object
   const emailRef = useRef(null);
@@ -31,6 +37,58 @@ const Login = () => {
     );
     // console.log(message);
     setErrMessage(message);
+
+    //Sign In and Sign Up Logic
+    if (message !== null) {
+      return;
+    } else {
+      if (!isSignedInForm) {
+        //Sign Up Logic
+
+        createUserWithEmailAndPassword(
+          auth,
+          emailRef.current.value,
+          passwordRef.current.value
+        )
+          .then((userCredential) => {
+            // Signed up
+            const user = userCredential.user;
+            console.log(user);
+          })
+          .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            console.log(errorCode + "--" + errorMessage);
+            setErrMessage(errorCode + "--" + errorMessage);
+          });
+      } else {
+        //Sign In Logic
+        signInWithEmailAndPassword(
+          auth,
+          emailRef.current.value,
+          passwordRef.current.value
+        )
+          .then((userCredential) => {
+            // Signed in
+            const user = userCredential.user;
+            console.log(user);
+          })
+          .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            console.log(errorCode + "--" + errorMessage);
+            if (
+              errorCode.includes("invalid-credential") ||
+              errorMessage.includes("invalid-credential")
+            ) {
+              // console.log(er);
+              setErrMessage(
+                "There is no user with this email id or please check the password"
+              );
+            }
+          });
+      }
+    }
   }
   return (
     <div>
@@ -46,9 +104,9 @@ const Login = () => {
         className="absolute w-[30%] my-36 p-14 bg-black mx-auto right-0 left-0 text-white bg-opacity-80 rounded-[4px]"
       >
         <h1 className="font-bold text-3xl py-6">
-          {isSignedIn ? "Sign Up" : "Sign In"}
+          {isSignedInForm ? "Sign In" : "Sign Up"}
         </h1>
-        {isSignedIn && (
+        {!isSignedInForm && (
           <input
             ref={fullNameRef}
             type="text"
@@ -78,18 +136,18 @@ const Login = () => {
           onClick={handleClick}
           className="bg-red-600 hover:bg-red-700 p-2 my-4 w-full rounded-[3px]"
         >
-          {isSignedIn ? "Sign Up" : "Sign In"}
+          {isSignedInForm ? "Sign In" : "Sign Up"}
         </button>
 
         <div className="my-4">
           <span className="opacity-70 ">
-            {isSignedIn ? "Already Registered? " : "New to Netflix? "}
+            {isSignedInForm ? "New to Netflix? " : "Already Registered? "}
           </span>
           <span
             onClick={toggleSignIn}
             className="cursor-pointer hover:underline"
           >
-            {isSignedIn ? "Sign In Now" : "Sign Up Now"}
+            {isSignedInForm ? "Sign Up Now" : "Sign In Now"}
           </span>
         </div>
       </form>
