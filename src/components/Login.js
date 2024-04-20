@@ -1,10 +1,36 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import Header from "./Header";
+import { checkValidate } from "../utils/validate";
+import { CrossIcon } from "../utils/svgConstants";
 
 const Login = () => {
   const [isSignedIn, setIsSignedIn] = useState(false);
+  const [errMessage, setErrMessage] = useState(null);
   function toggleSignIn() {
     setIsSignedIn(!isSignedIn);
+  }
+  //Create a reference for email,password and full name input and give back a current object
+  const emailRef = useRef(null);
+  const passwordRef = useRef(null);
+  const fullNameRef = useRef(null);
+
+  function handleClick() {
+    /*
+    This will give reference of email,password input HTML tag inside current object
+    console.log(emailRef);
+    console.log(passwordRef);
+
+    To access the value of input element we have to go inside current object and access value key
+    console.log(emailRef.current.value);
+    console.log(passwordRef.current.value);
+    */
+    const message = checkValidate(
+      emailRef.current.value,
+      passwordRef.current.value,
+      fullNameRef?.current?.value
+    );
+    // console.log(message);
+    setErrMessage(message);
   }
   return (
     <div>
@@ -15,39 +41,55 @@ const Login = () => {
           alt="background-img"
         />
       </div>
-      <form className="absolute w-3/12 my-36 p-10 bg-black mx-auto right-0 left-0 text-white bg-opacity-80">
-        <h1 className="font-bold text-3xl py-4">
-          {isSignedIn ? "Sign In" : "Sign Up"}
+      <form
+        onSubmit={(e) => e.preventDefault()}
+        className="absolute w-[30%] my-36 p-14 bg-black mx-auto right-0 left-0 text-white bg-opacity-80 rounded-[4px]"
+      >
+        <h1 className="font-bold text-3xl py-6">
+          {isSignedIn ? "Sign Up" : "Sign In"}
         </h1>
-        {!isSignedIn && (
+        {isSignedIn && (
           <input
+            ref={fullNameRef}
             type="text"
             placeholder="Full Name"
-            className="p-4 my-2 w-full bg-transparent rounded-[3px] border border-gray-500 focus:border-white focus:border-2 transition duration-300"
+            className="p-4 my-2 w-full bg-transparent rounded-[3px] border border-gray-500 focus:outline-none focus:border-white focus:border-[3px] transition duration-300 "
           />
         )}
         <input
+          ref={emailRef}
           type="email"
           placeholder="Email Address"
-          className="p-4 my-2 w-full bg-transparent rounded-[3px] border border-gray-500 focus:border-white focus:border-2 transition duration-300"
+          className="p-4 my-2 w-full bg-transparent rounded-[3px] border border-gray-500 focus:outline-none focus:border-white focus:border-[3px] transition duration-300"
         />
         <input
+          ref={passwordRef}
           type="password"
           placeholder="Password"
-          className="p-4 my-2 w-full bg-transparent rounded-[3px] border border-gray-500 focus:border-white focus:border-2 transition duration-300"
+          className="p-4 my-2 w-full bg-transparent rounded-[3px] border border-gray-500 focus:outline-none focus:border-white focus:border-[3px] transition duration-300"
         />
-        <button className="bg-red-700 hover:bg-red-800 p-2 my-4 w-full rounded-[3px]">
-          {isSignedIn ? "Sign In" : "Sign Up"}
+        {errMessage !== null && (
+          <div className="flex items-center text-red-600 my-2">
+            <CrossIcon />
+            <p className="mx-1">{errMessage}</p>
+          </div>
+        )}
+        <button
+          onClick={handleClick}
+          className="bg-red-600 hover:bg-red-700 p-2 my-4 w-full rounded-[3px]"
+        >
+          {isSignedIn ? "Sign Up" : "Sign In"}
         </button>
+
         <div className="my-4">
           <span className="opacity-70 ">
-            {isSignedIn ? "New to Netflix? " : "Already Registered? "}
+            {isSignedIn ? "Already Registered? " : "New to Netflix? "}
           </span>
           <span
             onClick={toggleSignIn}
             className="cursor-pointer hover:underline"
           >
-            {isSignedIn ? "Sign Up Now" : "Sign In Now"}
+            {isSignedIn ? "Sign In Now" : "Sign Up Now"}
           </span>
         </div>
       </form>

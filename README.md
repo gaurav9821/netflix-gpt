@@ -5,7 +5,11 @@
 - Create React App
 - Configure and Use Tailwind CSS
 - Header
+- Routing
 - Login Form
+- Sign Up Form
+- Form Validation
+- What is useRef() Hook for email and password validation(It can be done using State Variable also)
 
 ## Features:
 
