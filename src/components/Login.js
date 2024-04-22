@@ -5,6 +5,7 @@ import { CrossIcon } from "../utils/svgConstants";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  updateProfile,
 } from "firebase/auth";
 import { auth } from "../utils/firebase";
 import { useNavigate } from "react-router-dom";
@@ -25,6 +26,20 @@ const Login = () => {
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
   const fullNameRef = useRef(null);
+
+  function updateUser(user) {
+    updateProfile(user, {
+      displayName: fullNameRef.current.value,
+      // photoURL: "https://example.com/jane-q-user/profile.jpg",
+    })
+      .then(() => {
+        const { uid, email, displayName } = auth.currentUser;
+        dispatch(addUser({ uid: uid, email: email, displayName: displayName }));
+      })
+      .catch((error) => {
+        setErrMessage(error.message);
+      });
+  }
 
   function handleClick() {
     /*
@@ -59,7 +74,8 @@ const Login = () => {
           .then((userCredential) => {
             // Signed up
             const user = userCredential.user;
-            console.log(user);
+            // console.log(user);
+            updateUser(user);
             navigate("/browse");
           })
           .catch((error) => {
