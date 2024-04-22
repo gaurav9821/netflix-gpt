@@ -13,6 +13,8 @@
 - Configure Firebase for Authentication
 - Deploy your app to firebase
 - Create a SignUp User Account
+- Configure Firebase Authentication for Sign Up and Sign In form with Firebase Sign In and Sign Up API
+- After Sign or Sign Up store User data to Redux Store
 
 ## Features:
 
@@ -32,6 +34,15 @@
 
   - Search Bar
   - Movie Suggestions
+
+## Redux Store
+
+- When user Sign up/Sign In store data in User store using Redux
+  - Install @reduxjs/toolkit and react-redux library
+  - Create a redux store in Util folder appStore.js
+    - use configureStore from RTK
+  - Create userSlice.js in util folder
+    - use createSlice from RTK
 
 ## Deployment:
 

@@ -7,10 +7,16 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { auth } from "../utils/firebase";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import { useDispatch } from "react-redux";
+import { addUser, removeUser } from "../utils/userSlice";
 
 const Login = () => {
   const [isSignedInForm, setIsSignedInForm] = useState(true);
   const [errMessage, setErrMessage] = useState(null);
+  const navigate = useNavigate();
   function toggleSignIn() {
     setIsSignedInForm(!isSignedInForm);
     setErrMessage(null);
@@ -54,12 +60,14 @@ const Login = () => {
             // Signed up
             const user = userCredential.user;
             console.log(user);
+            navigate("/browse");
           })
           .catch((error) => {
             const errorCode = error.code;
             const errorMessage = error.message;
-            console.log(errorCode + "--" + errorMessage);
+            // console.log(errorCode + "--" + errorMessage);
             setErrMessage(errorCode + "--" + errorMessage);
+            navigate("/login");
           });
       } else {
         //Sign In Logic
@@ -72,24 +80,40 @@ const Login = () => {
             // Signed in
             const user = userCredential.user;
             console.log(user);
+            navigate("/browse");
           })
           .catch((error) => {
             const errorCode = error.code;
             const errorMessage = error.message;
-            console.log(errorCode + "--" + errorMessage);
+            // console.log(errorCode + "--" + errorMessage);
             if (
               errorCode.includes("invalid-credential") ||
               errorMessage.includes("invalid-credential")
             ) {
-              // console.log(er);
               setErrMessage(
                 "There is no user with this email id or please check the password"
               );
             }
+            navigate("/login");
           });
       }
     }
   }
+  const dispatch = useDispatch();
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // User is signed in, see docs for a list of available properties
+        // https://firebase.google.com/docs/reference/js/auth.user
+        const { uid, email, displayName } = user;
+        // console.log(uid);
+        dispatch(addUser({ uid: uid, email: email, displayName: displayName }));
+      } else {
+        // User is signed out
+        dispatch(removeUser());
+      }
+    });
+  }, []);
   return (
     <div>
       <Header />
