@@ -15,6 +15,8 @@
 - Create a SignUp User Account
 - Configure Firebase Authentication for Sign Up and Sign In form with Firebase Sign In and Sign Up API
 - After Sign or Sign Up store User data to Redux Store
+- Implemented Sign out
+- Update profile API
 
 ## Features:
 
